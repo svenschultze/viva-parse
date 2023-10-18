@@ -30,5 +30,4 @@ jobs:
         python -m pip install .[test]
     - name: Test with pytest
       run: |
-        ls
-        pytest tests/viva-parse/test.py
+        pytest tests/viva_parse/test.py
