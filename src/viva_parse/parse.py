@@ -17,7 +17,7 @@ def parse_messages(raw_text, roles=available_roles):
     return messages
 
 def parse_actions(message):
-    pattern = re.compile("<\|(?P<action>[^|]+)\|>(?P<params>[^|]*)<\|endofaction\|>")
+    pattern = re.compile("<\|(?P<action>[^|]+)\|>(?P<params>[^!|]+)?(?:<!return!>(?P<return>[^|]+)?)?<\|endofaction\|>")
 
     msg = message["message"]
     message["actions"] = []
@@ -25,12 +25,20 @@ def parse_actions(message):
     for match in re.finditer(pattern, msg):
         action = match.group("action")
         params = match.group("params")
-
-
-        message["actions"].append({
-            "name": action,
-            "params": parse_params(params)
-        })
+        return_match = match.group("return")
+        
+        action = {
+            "name": action
+        }
+        
+        if params:
+            action["params"] = parse_params(params)
+        
+        if return_match:
+            action["return"] = return_match.replace("<!return!>", "").strip()
+            
+            
+        message["actions"].append(action)
     
     if not message["actions"]:
         del message["actions"]
